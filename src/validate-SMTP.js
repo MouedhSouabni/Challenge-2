@@ -12,9 +12,9 @@ function validateSMTP(exchange, emailAddress) {
 		// a list of SMTP commands to run before an email address is considered valid
 		let smtpCommands = [
 
-			'EHLO ' + exchange,
-			'MAIL FROM: <bballermos@gmail.com>',
-			'RCPT TO: <' + emailAddress + '>'
+			'EHLO ' + exchange + '\r\n',
+			'MAIL FROM: <bballermos@gmail.com>\r\n',
+			'RCPT TO: <' + emailAddress + '>\r\n'
 
 		]
 
@@ -32,10 +32,7 @@ function validateSMTP(exchange, emailAddress) {
 			client.end()
 			client.destroy()
 
-			return resolve({
-				exchange,
-				emailAddress
-			})
+			return resolve(true)
 		})
 
 		client.on('next', () => {
@@ -63,9 +60,17 @@ function validateSMTP(exchange, emailAddress) {
 				// and convert to integer
 				const statusCode = parseInt(data?.split(' ')[0])
 
-				if ( statusCode === 220 || statusCode == 250 ) return client.emit( 'next', data )
+				switch ( statusCode ) {
 
-				return client.emit( 'error', data )
+					case 220:
+						client.emit( 'next', data ); break
+
+					case 250:
+						client.emit( 'next', data ); break
+
+					default: 
+						client.emit( 'error', data )
+				}
 
 
 			})
@@ -82,7 +87,7 @@ function validateSMTP(exchange, emailAddress) {
 		// listen to the client errors
 		client.on('error', err=> {
 			console.log('Error ', err)
-			reject(err)
+			resolve(false)
 		})
 
 

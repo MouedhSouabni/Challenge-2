@@ -1,8 +1,10 @@
 // Importing "readfile" function to read the file // "isValidDomain" function to validate the domain // "hasValidMxRecord" function to validate Mx record
-import { readFile } from 'fs'
+import { readFile, writeFile  } from 'fs'
 import { isValidDomain } from './validate-domain.js'
 import { hasValidMxRecord } from './mx-record-validator.js'
 import { validateSMTP } from './validate-SMTP.js'
+
+
 
 ;(() => {
     // Reading the file. 'utf8' to read text file.
@@ -66,8 +68,8 @@ import { validateSMTP } from './validate-SMTP.js'
                     new Promise((resolve, reject)=>
 
                         validateSMTP(x.exchange, x.emailAddress)
-                            .then(result=> 
-                                resolve(x))
+                            .then(isResolved=> 
+                                resolve({ ...x, isResolved }))
                             .catch(e=> 
                                 reject(e))
 
@@ -77,12 +79,14 @@ import { validateSMTP } from './validate-SMTP.js'
             
             // when all smtp validated do the following
             const smtpValidatedEmails = await Promise.all(smtpValidated)
-
+            const content = smtpValidatedEmails
+                .filter(x=> !!x.isResolved)
+                .map(x=> x.fullName + ', ' + x.emailAddress)
+                .join('\r\n')
 
             console.log( 'smpt validated emails ', smtpValidatedEmails )
-            return smtpValidatedEmails
 
-
+            return writeFile('./output.txt', content, 'utf8', ()=> console.log('Files created'))
 
         } catch (e) {
             console.log('caught error ', e)
