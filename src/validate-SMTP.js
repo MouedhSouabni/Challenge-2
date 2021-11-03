@@ -52,7 +52,7 @@ function validateSMTP(exchange, emailAddress) {
 		client.on('connect', () => {
 
 			client.on('data', data => {
-				console.log('DATA: ' + data)
+				// console.log('DATA: ' + data)
 
 				if ( !data?.length ) return client.emit('error', data)
 
