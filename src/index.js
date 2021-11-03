@@ -8,7 +8,7 @@ import { validateSMTP } from './validate-SMTP.js'
 
 ;(() => {
     // Reading the file. 'utf8' to read text file.
-    readFile('/Users/User/Desktop/Mouedh/Development/challenge-2/test/index.txt', 'utf8', async (err, data) => {
+    readFile('./test/index.txt', 'utf8', async (err, data) => {
 
         try {
 
