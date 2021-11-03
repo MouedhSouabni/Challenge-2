@@ -1,8 +1,8 @@
 // Importing "readfile" function to read the file // "isValidDomain" function to validate the domain // "hasValidMxRecord" function to validate Mx record
 import { readFile, writeFile  } from 'fs'
-import { isValidDomain } from './validate-domain.js'
-import { hasValidMxRecord } from './mx-record-validator.js'
-import { validateSMTP } from './validate-SMTP.js'
+import { isValidDomain } from './validate-domain'
+import { hasValidMxRecord } from './mx-record-validator'
+import { validateSMTP } from './validate-SMTP'
 
 
 

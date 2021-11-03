@@ -1,4 +1,4 @@
-import { disposableDomainList } from './disposable-domains.js' // Imports list of disposable domains
+import { disposableDomainList } from './disposable-domains' // Imports list of disposable domains
 
 const processedDisposableDomains = new Set(disposableDomainList) // Duplicates the list then sets it to the new version to avoid repetition
 function isValidDomain(domain) {
