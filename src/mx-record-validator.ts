@@ -1,6 +1,6 @@
 import { MxRecord, resolveMx } from 'dns'
 
-function exchangeByDomainName(domain: string): Promise<string> {
+function exchangeByDomainName(domain: string): Promise<string|undefined> {
      
     return new Promise((resolve, reject)=> {
 
@@ -8,6 +8,8 @@ function exchangeByDomainName(domain: string): Promise<string> {
             
             let nominatedPriority: number = 0
             let exchange: string = ''
+
+            if ( !addresses?.length ) return resolve(undefined)
     
             for( let i = 0; i < addresses.length; i++) {
     

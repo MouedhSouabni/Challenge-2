@@ -92,8 +92,10 @@ function validateSMTP(exchange: string, emailAddress: string): Promise<boolean> 
 
 
 		// listen to when the client's connection is closed
-		client.on('close', ()=> 
-			console.log('Connection closed'))
+		client.on('close', ()=> {
+			console.log('Connection closed')
+			client.emit( 'error', 'Connection closed' )
+		})
 
 	})
 
