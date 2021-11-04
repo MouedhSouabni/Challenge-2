@@ -1,14 +1,14 @@
 // Importing "readfile" function to read the file // "isValidDomain" function to validate the domain // "hasValidMxRecord" function to validate Mx record
 import { readFile, writeFile  } from 'fs'
 import { isValidDomain } from './validate-domain'
-import { hasValidMxRecord } from './mx-record-validator'
+import { exchangeByDomainName } from './mx-record-validator'
 import { validateSMTP } from './validate-SMTP'
+import { ContactRecord } from './types'
 
 
-
-;(() => {
+(() => {
     // Reading the file. 'utf8' to read text file.
-    readFile('./test/index.txt', 'utf8', async (err, data) => {
+    readFile('../test/index.txt', 'utf8', async ( err: unknown, data: string ) => {
 
         try {
 
@@ -16,8 +16,9 @@ import { validateSMTP } from './validate-SMTP'
                 console.error(err)
                 return
             }
+
             // Splits the list
-            const processedData = data.split('\r\n').map(x => {
+            const processedData: ContactRecord[] = data.split('\r\n').map((x: string): ContactRecord => {
 
                 const [fullName, emailAddress] = x.split(', ')
 
@@ -28,48 +29,47 @@ import { validateSMTP } from './validate-SMTP'
 
             })
 
-            let exchangeValidated = []
-            let smtpValidated = []
+            let exchangeValidated: Array<Promise<boolean|ContactRecord>> = []
+            let smtpValidated: Array<Promise<boolean|ContactRecord>> = []
 
-            processedData.forEach(x => {
+            processedData.forEach((x: any) => {
 
-                exchangeValidated.push(new Promise((resolve, reject) => {
+                    exchangeValidated.push(new Promise((resolve, reject) => {
 
-                    if (!/^\w*\.?\w+\@\w+\.\w+$/gm.test(x.emailAddress)) return resolve(false)
-
-
-                    // Filters using domain name validity
-                    if (!isValidDomain(x.emailAddress?.split('@')[1])) return resolve(false)
+                        if (!/^\w*\.?\w+\@\w+\.\w+$/gm.test(x.emailAddress))
+                            return resolve(false);
 
 
-                    // wait until mx record is retrieved
-                    return hasValidMxRecord(x.emailAddress?.split('@')[1])
-                        .then(exchange =>
-                            resolve({
+                        // Filters using domain name validity
+                        if (!isValidDomain(x.emailAddress?.split('@')[1]))
+                            return resolve(false);
+
+
+                        // wait until mx record is retrieved
+                        return exchangeByDomainName(x.emailAddress?.split('@')[1])
+                            .then((exchange) => resolve({
                                 ...x,
                                 exchange
                             }))
-                        .catch(e =>
-                            reject(e))
+                            .catch((e: unknown) => reject(e));
 
 
-                }))
+                    }));
 
-            })
+                })
 
 
             // when all exchange validated do the following
-            const validEmailsWithExchange = await Promise.all(exchangeValidated)
-            const filteredEmailsWithExchange = validEmailsWithExchange.filter(a=> a != false)
+            const validEmailsWithExchange: Array<boolean|ContactRecord> = await Promise.all(exchangeValidated)
+            const filteredEmailsWithExchange: Array<boolean|ContactRecord> = validEmailsWithExchange.filter((a: any)=> a != false)
 
         
-            !!filteredEmailsWithExchange?.length && filteredEmailsWithExchange.forEach(x=> 
+            !!filteredEmailsWithExchange?.length && filteredEmailsWithExchange.forEach((x: any)=> 
                 smtpValidated.push(
                     new Promise((resolve, reject)=>
 
                         validateSMTP(x.exchange, x.emailAddress)
-                            .then(isResolved=> 
-                                resolve({ ...x, isResolved }))
+                            .then((isResolved: boolean) => resolve({ ...x, isResolved }))
                             .catch(e=> 
                                 reject(e))
 
@@ -78,17 +78,16 @@ import { validateSMTP } from './validate-SMTP'
 
             
             // when all smtp validated do the following
-            const smtpValidatedEmails = await Promise.all(smtpValidated)
-            const content = smtpValidatedEmails
-                .filter(x=> !!x.isResolved)
-                .map(x=> x.fullName + ', ' + x.emailAddress)
+            const smtpValidatedEmails: Array<boolean|ContactRecord> = await Promise.all(smtpValidated)
+            const content: string = smtpValidatedEmails
+                .map((x: any)=> x.fullName + ', ' + x.emailAddress)
                 .join('\r\n')
 
-            console.log( 'smpt validated emails ', smtpValidatedEmails )
+            // console.log( 'smpt validated emails ', smtpValidatedEmails )
 
             return writeFile('./output.txt', content, 'utf8', ()=> console.log('Files created'))
 
-        } catch (e) {
+        } catch (e: unknown) {
             console.log('caught error ', e)
         }
 

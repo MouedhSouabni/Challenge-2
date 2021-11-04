@@ -1,16 +1,16 @@
 
-import { connect } from 'net'
+import { Socket, connect, createConnection } from 'net'
 
 
 // SMTP error code ref: https://datatracker.ietf.org/doc/html/rfc5321#section-4.2.3
 
-function validateSMTP(exchange, emailAddress) {
+function validateSMTP(exchange: string, emailAddress: string): Promise<boolean> {
 
 	return new Promise((resolve, reject) => {
 
 
 		// a list of SMTP commands to run before an email address is considered valid
-		let smtpCommands = [
+		let smtpCommands: string[] = [
 
 			'EHLO ' + exchange + '\r\n',
 			'MAIL FROM: <bballermos@gmail.com>\r\n',
@@ -19,7 +19,7 @@ function validateSMTP(exchange, emailAddress) {
 		]
 
 		// create a client that should connect to port 25
-		const client = connect(25, exchange)
+		const client: Socket = createConnection(25, exchange)
 
 		client.setEncoding('ascii')
 		client.setTimeout(10e3)
@@ -43,7 +43,7 @@ function validateSMTP(exchange, emailAddress) {
 			if ( !smtpCommands?.length ) return client.emit('success')
 
 			return client.writable ? 
-				client.write(smtpCommands.shift()):
+				client.write(smtpCommands.shift() as string):
 				client.emit( 'error', 'SMTP connected closed unexpectedly' )
 
 		})
@@ -51,25 +51,25 @@ function validateSMTP(exchange, emailAddress) {
 		// start listening to the data only after the client is connected
 		client.on('connect', () => {
 
-			client.on('data', data => {
+			client.on('data', (data: string) => {
 				// console.log('DATA: ' + data)
 
 				if ( !data?.length ) return client.emit('error', data)
 
 				// catch the status code of every message
 				// and convert to integer
-				const statusCode = parseInt(data?.split(' ')[0])
+				const statusCode: number = parseInt(data?.split(' ')[0])
 
 				switch ( statusCode ) {
 
 					case 220:
-						client.emit( 'next', data ); break
+						return client.emit( 'next', data );
 
 					case 250:
-						client.emit( 'next', data ); break
+						return client.emit( 'next', data );
 
 					default: 
-						client.emit( 'error', data )
+						return client.emit( 'error', data )
 				}
 
 
@@ -85,7 +85,7 @@ function validateSMTP(exchange, emailAddress) {
 
 
 		// listen to the client errors
-		client.on('error', err=> {
+		client.on('error', (err: Error)=> {
 			console.log('Error ', err)
 			resolve(false)
 		})

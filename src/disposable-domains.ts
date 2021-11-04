@@ -1,4 +1,4 @@
-const disposableDomainList = [
+const disposableDomainList: string[] = [
 "0-attorney.com",
 "0-mail.com",
 "00.msk.ru",

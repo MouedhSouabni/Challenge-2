@@ -1,23 +1,13 @@
-import { resolveMx } from 'dns'
+import { MxRecord, resolveMx } from 'dns'
 
-
-/*
-
-5
-14
-2
-5
-6
-
-*/
- function hasValidMxRecord(domain) {
+function exchangeByDomainName(domain: string): Promise<string> {
      
     return new Promise((resolve, reject)=> {
 
-        return resolveMx(domain, (err, addresses) => {
+        return resolveMx(domain, (err: unknown, addresses: MxRecord[]): void => {
             
-            let nominatedPriority = 0
-            let exchange
+            let nominatedPriority: number = 0
+            let exchange: string = ''
     
             for( let i = 0; i < addresses.length; i++) {
     
@@ -26,15 +16,12 @@ import { resolveMx } from 'dns'
                     exchange = addresses[i].exchange
                 }
 
-                
             }
 
             return resolve(exchange)
         })
     })
 
-
-
  }
 
- export { hasValidMxRecord }
+ export { exchangeByDomainName }
