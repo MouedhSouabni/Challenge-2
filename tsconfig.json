@@ -3,12 +3,17 @@
         "outDir": "./dist/",
         "sourceMap": true,
         "strict": true,
-        "noImplicitReturns": true,
-        "noImplicitAny": true,
-        "module": "commonjs",
+
+        "noImplicitReturns": false,
         "moduleResolution": "node",
-        "target": "esnext",
+        "esModuleInterop": true,
         "allowJs": true,
+        "declaration": true,
+        "target": "esnext",
+        "lib": ["esnext", "dom"],
+        "skipLibCheck": true,
+        "noUnusedLocals": false,
+        "types": [ "node" ]
     },
     "include": [
         "./src/**/*"

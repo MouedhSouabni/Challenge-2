@@ -17,7 +17,7 @@ import { ContactRecord } from './types'
             }
 
             // Splits the list
-            const processedData: ContactRecord[] = data.split('\r\n').map((x: string): ContactRecord => {
+            const processedData: ContactRecord[] = data.split('\n').map((x: string): ContactRecord => {
 
                 const [fullName, emailAddress] = x.split(', ')
 
