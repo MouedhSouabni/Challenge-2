@@ -1,14 +1,13 @@
 // Importing "readfile" function to read the file // "isValidDomain" function to validate the domain // "hasValidMxRecord" function to validate Mx record
-import { readFile, writeFile  } from 'fs'
+import { readFile, writeFile } from 'fs'
 import { isValidDomain } from './validate-domain'
 import { exchangeByDomainName } from './mx-record-validator'
 import { validateSMTP } from './validate-SMTP'
 import { ContactRecord } from './types'
 
-
-(() => {
+;(() => {
     // Reading the file. 'utf8' to read text file.
-    readFile('../test/index.txt', 'utf8', async ( err: unknown, data: string ) => {
+    readFile('./test/index.txt', 'utf8', async ( err: unknown, data: string ) => {
 
         try {
 
