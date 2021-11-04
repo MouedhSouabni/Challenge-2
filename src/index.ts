@@ -60,7 +60,8 @@ import { ContactRecord } from './types'
 
             // when all exchange validated do the following
             const validEmailsWithExchange: Array<boolean|ContactRecord> = await Promise.all(exchangeValidated)
-            const filteredEmailsWithExchange: Array<boolean|ContactRecord> = validEmailsWithExchange.filter((a: any)=> a != false)
+            const filteredEmailsWithExchange: Array<boolean|ContactRecord> = validEmailsWithExchange
+                .filter((a: any)=> a != false && !!a.exchange?.length && a.exchange !== undefined)
 
         
             !!filteredEmailsWithExchange?.length && filteredEmailsWithExchange.forEach((x: any)=> 
@@ -77,8 +78,9 @@ import { ContactRecord } from './types'
 
             
             // when all smtp validated do the following
-            const smtpValidatedEmails: Array<boolean|ContactRecord> = await Promise.all(smtpValidated)
+            const smtpValidatedEmails: Array<ContactRecord> = await Promise.all(smtpValidated) as Array<ContactRecord>
             const content: string = smtpValidatedEmails
+                .filter(a=> !!a.isResolved)
                 .map((x: any)=> x.fullName + ', ' + x.emailAddress)
                 .join('\r\n')
 
